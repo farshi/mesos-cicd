@@ -1,7 +1,7 @@
-I want to use Apache Mesos, Marathon and  Jenkins to implement full Continouous Integration and Continious Delivery (CI/CD)
+I want to use [Apahce Mesos](http://http://mesos.apache.org/), Marathon and  Jenkins to implement full Continuous Integration and Continuous Delivery (CI/CD)
 ##Installing specific version of docker and docker-compose in ubuntu
 
-Sometime we need to install down graded version of docker and docker-compose , for example Apahce Mesos currently does not work with docker latest version (1.8.1 - when I a writing this guide) and I need to install docker 1.6.2 to sort it out.
+Sometime we need to install down graded version of docker and docker-compose , for example Apache Mesos currently does not work with docker latest version (1.8.1 - when I a writing this guide) and I need to install docker 1.6.2 to sort it out.
 
 
 Download the repository key by running this command:
@@ -168,14 +168,3 @@ put these lines in jenkins
 
 sh build.sh $BUILD_NUMBER
 sh push.sh $BUILD_NUMBER
-
-
-
-
-
-===================downgrade docker-compose
-
-curl -L https://github.com/docker/compose/releases/download/1.3.0/docker-compose-`uname -s`-`uname -m`  > docker-composer
-
-chmod +x docker-compose
-mv docker-compose /usr/local/bin
