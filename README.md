@@ -1,9 +1,9 @@
 I want to use [Apahce Mesos](http://http://mesos.apache.org/), Marathon and  Jenkins to implement full Continuous Integration and Continuous Delivery (CI/CD)
 ##Installing specific version of docker and docker-compose in ubuntu
 
-Sometime we need to install down graded version of docker and docker-compose , for example Apache Mesos currently does not work with docker latest version (1.8.1 - when I a writing this guide) and I need to install docker 1.6.2 to sort it out.
+Sometime we need to install down graded version of docker and docker-compose , for example Apache Mesos currently does not work with docker latest version (1.8.1 - when I a writing this guide) and I need to install docker 1.6.2 to sort it out and alse docker-composer 1.3..
 
-
+###Installing docker
 Download the repository key by running this command:
 
 ```shell
@@ -31,6 +31,19 @@ Go version (server): go1.4.2
 Git commit (server): 7c8fca2
 OS/Arch (server): linux/amd64
 ```
+
+###Installing docker-compose
+
+run this commands :
+
+```shell
+$ curl -L https://github.com/docker/compose/releases/download/1.3.0/docker-compose-`uname -s`-`uname -m`  > docker-composer
+
+$ chmod +x docker-compose
+$ sudo mv docker-compose /usr/local/bin
+
+```
+
 We need to share NFS based synced folders between developer machine and vagrant machine, Mac OSx
 by default has the nfsd but for Ububtu you need to install it.
 
@@ -162,9 +175,3 @@ if you want to ssh to jenkins instance and use the instance in a interactive mod
 docker run -t -i -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker  -v /home/reza/jenkins-stuff:/var/jenkins_home  -v  /usr/lib/x86_64-linux-gnu/libapparmor.so.1.1.0:/lib/x86_64-linux-gnu/libapparmor.so.1 -p 8080:8080 localhost:5000/reza/myjenkins bash
 
 ```
-
-
-put these lines in jenkins
-
-sh build.sh $BUILD_NUMBER
-sh push.sh $BUILD_NUMBER
