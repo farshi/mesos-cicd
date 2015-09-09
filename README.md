@@ -1,7 +1,37 @@
+I want to use Apache Mesos, Marathon and  Jenkins to implement full Continouous Integration and Continious Delivery (CI/CD)
+##Installing specific version of docker and docker-compose in ubuntu
+
+Sometime we need to install down graded version of docker and docker-compose , for example Apahce Mesos currently does not work with docker latest version (1.8.1 - when I a writing this guide) and I need to install docker 1.6.2 to sort it out.
 
 
+Download the repository key by running this command:
 
-we need to share NFS based synced folders between developer machine and vagrant machine, Mac OSx
+```shell
+$ sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
+$ sudo sh -c "echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
+$ sudo apt-get update
+$ sudo apt-get -y  --force-yes install lxc-docker-1.6.2
+
+```
+for being able to run docker commands as non-sudo you should run this command:
+
+```shell
+$ sudo usermod -a -G docker $USER
+```
+for testing success of the instalation run `$ docker version` and teh output should be looklike this:
+```
+Client version: 1.6.2
+Client API version: 1.18
+Go version (client): go1.4.2
+Git commit (client): 7c8fca2
+OS/Arch (client): linux/amd64
+Server version: 1.6.2
+Server API version: 1.18
+Go version (server): go1.4.2
+Git commit (server): 7c8fca2
+OS/Arch (server): linux/amd64
+```
+We need to share NFS based synced folders between developer machine and vagrant machine, Mac OSx
 by default has the nfsd but for Ububtu you need to install it.
 
 ``` shell
@@ -26,38 +56,21 @@ for using nfs synced folder we should assign ip address to the Host vm
 
 vagrant up --provider=docker
 
-vagrant ssh
+```shell
+$ vagrant ssh
+```
 
+#Dockerized jenkins
 
-#Run registry First
+for building jenkins docker image and pushing it to your running local docker registry follow these steps.
 
-docker run -p 5000:5000 -v /box/mesos-cicd/.localdata/registry-stuff:/registry -e STORAGE_PATH=/registry registry
+```shell
+$ mkdir jenkins
+$ cd jenkins
+$ vim Dockerfile
+```
 
-
-docker build -t localhost:5000/reza/nodejs_app .
-docker push localhost:5000/reza/nodejs_app
-
-
-mkdir ../jenkins
-cd ../jenkins
-
-
-id reza
-(999)docker
-vi Dockerfile
-
-
-#FROM jenkins
-
-#MAINTAINER Reza
-
-#USER root
-#TODO the group ID for docker group on my Ubuntu is 125, therefore I #can only run docker commands if I have same group id inside.
-# Otherwise the socket file is not accessible.
-#RUN groupadd -g 999 docker && usermod -a -G docker jenkins
-#USER jenkins
-
-
+```yamil
 FROM jenkins:1.596
 
 USER root
@@ -72,76 +85,84 @@ RUN echo "jenkins ALL=NOPASSWD: ALL" >> /etc/sudoers
 USER jenkins
 COPY plugins.txt /usr/share/jenkins/plugins.txt
 RUN /usr/local/bin/plugins.sh /usr/share/jenkins/plugins.txt
+```
 
-vim apt.conf
+```shell
+$ vim apt.conf
+```
+
+```
 Acquire::socks::proxy "socks://10.44.41.228:1080/";
 Acquire::http::proxy "http://10.44.41.228:8080/";
 Acquire::https::proxy "http://10.44.41.228:8080/";
-
-vim plugins.txt
+```
+```shell
+$ vim plugins.txt
+```
+```yamil
 scm-api:latest
 git-client:latest
 git:latest
 greenballs:latest
+```
+
+if you don't have docker local registry it's so easy, you can run local docker registry inside docker. it's cool is'nt it , just run this command:
+
+Run registry First
+
+```shell
+docker run -p 5000:5000 -v ./registry-stuff:/registry -e STORAGE_PATH=/registry registry
+```
 
 
+Now for building and pushing the jenkins docker image to the local registry , run this commands
 
-docker build -t localhost:5000/reza/myjenkins .
-docker push localhost:5000/reza/myjenkins
+```shell
+$ docker build -t localhost:5000/reza/myjenkins .
+$ docker push localhost:5000/reza/myjenkins
+```
+for find out the success of pushing you can run this , and then it should return the machine id.
+```shell
+$ curl http://localhost:5000/v1/repositories/reza/myjenkins/tags/latest
+```
 
-curl http://localhost:5000/v1/repositories/reza/myjenkins/tags/latest
-curl http://localhost:5000/v1/repositories/reza/nodejs_app/tags/latest
+#Running  jenkins
 
-Running  jenkins
+for running jenkins docker instance run this
 
-first kill
+```shell
+docker run -t  -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker  -v /home/reza/jenkins-stuff:/var/jenkins_home  -v  /usr/lib/x86_64-linux-gnu/libapparmor.so.1.1.0:/lib/x86_64-linux-gnu/libapparmor.so.1 -p 8080:8080 localhost:5000/reza/myjenkins
+```
+
+ you can use these command to getting bash of docker instances
+
+``` shell getting bash from contariner
+$ sudo docker exec -i -t 665b4a1e17b6 bash #by ID
+or
+$ sudo docker exec -i -t machine-name bash #by Name
+$ root@665b4a1e17b6:/#
+```
+
+
+if you want to kill jenkins docker instance and run it again , here is a handy shell command , that save your time. instead running `$ docker ps ` command and c/p jenkins instance id you can run this command.
+
+
+```jenkins
 docker kill `(docker ps  | grep  jenkins | cut -c 1-12 )`
+```
+for killing all docker instances use this handy command
 
-run
+```shell
+ docker kill `(docker ps )| grep tcp|cut -c 1-12`
+```
+###Runnig jenkins in interactive mode
+if you want to ssh to jenkins instance and use the instance in a interactive mode you can use this command
 
-docker run -t   -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker  -v /home/reza/doj/docker/mesos/jenkins-stuff:/var/jenkins_home  -v  /usr/lib/x86_64-linux-gnu/libapparmor.so.1.1.0:/lib/x86_64-linux-gnu/libapparmor.so.1 -p 8080:8080 localhost:5000/reza/myjenkins
+```shell
+docker run -t -i -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker  -v /home/reza/jenkins-stuff:/var/jenkins_home  -v  /usr/lib/x86_64-linux-gnu/libapparmor.so.1.1.0:/lib/x86_64-linux-gnu/libapparmor.so.1 -p 8080:8080 localhost:5000/reza/myjenkins bash
 
+```
 
-update docker-compose.yml
-
-registry:
-  image: registry
-  environment:
-    - STORAGE_PATH=/registry
-  volumes:
-    - registry-stuff:/registry
-  ports:
-    - "5000:5000"
-
-my_nodejs_app:
-  image: localhost:5000/reza/nodejs_app
-  ports:
-     - "8000:8000"
-
-jenkins:
-  image: localhost:5000/reza/myjenkins
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    - /usr/bin/docker:/usr/bin/docker
-    - /home/reza/doj/docker/mesos/jenkins-stuff:/var/jenkins_home
-    - /usr/lib/x86_64-linux-gnu/libapparmor.so.1.1.0:/lib/x86_64-linux-gnu/libapparmor.so.1
-
-  ports:
-    - "8081:8080"
-
-
-interactive connecting to jenkins
-first kill
-
-docker kill `(docker ps  | grep  jenkins | cut -c 1-12 )`
-
-docker run -t -i  -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker  -v /home/reza/doj/docker/mesos/jenkins/data:/var/jenkins_home -v  /usr/lib/x86_64-linux-gnu/libapparmor.so.1.1.0:/lib/x86_64-linux-gnu/libapparmor.so.1 -p 8080:8080 localhost:5000/reza/myjenkins  bash
-
-
-
-
-
-==========
 
 put these lines in jenkins
 
@@ -149,77 +170,12 @@ sh build.sh $BUILD_NUMBER
 sh push.sh $BUILD_NUMBER
 
 
-kill all process
- docker kill `(docker ps )| grep tcp|cut -c 1-12`
 
 
-drwxrwxr-x 9 root root 4096 Sep  1 11:34 jenkins-stuff/
-drwxr-xr-x 13 reza reza 4096 Aug 31 16:40 data/
 
-
-========downgrade docker ==========
-How to Install Docker Engine 1.6.2
-
-Download the repository key with:
-
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
-
-Then setup the repository:
-
-$ sudo sh -c "echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
-$ sudo apt-get update
-$ sudo apt-get -y  --force-yes install lxc-docker-1.6.2
-
-
-Run docker as non-sudo:
-
-$ sudo usermod -a -G docker $USER
-$ exit
-
-==downgrade docker-compose
+===================downgrade docker-compose
 
 curl -L https://github.com/docker/compose/releases/download/1.3.0/docker-compose-`uname -s`-`uname -m`  > docker-composer
 
 chmod +x docker-compose
 mv docker-compose /usr/local/bin
-
-
-=======docker version 1.8
-
-Client:
- Version:      1.8.1
- API version:  1.20
- Go version:   go1.4.2
- Git commit:   d12ea79
- Built:        Thu Aug 13 02:35:49 UTC 2015
- OS/Arch:      linux/amd64
-
-Server:
- Version:      1.8.1
- API version:  1.20
- Go version:   go1.4.2
- Git commit:   d12ea79
- Built:        Thu Aug 13 02:35:49 UTC 2015
- OS/Arch:      linux/amd64
-
-
-===============docker version 1.6 ===============
-
-
-reza@reza-ubuntu:~$ docker version
-Client version: 1.6.2
-Client API version: 1.18
-Go version (client): go1.4.2
-Git commit (client): 7c8fca2
-OS/Arch (client): linux/amd64
-Server version: 1.6.2
-Server API version: 1.18
-Go version (server): go1.4.2
-Git commit (server): 7c8fca2
-OS/Arch (server): linux/amd64
-
-=========getting bash from contariner ==================
-$ sudo docker exec -i -t 665b4a1e17b6 bash #by ID
-or
-$ sudo docker exec -i -t loving_heisenberg bash #by Name
-$ root@665b4a1e17b6:/#
