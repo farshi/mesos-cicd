@@ -43,8 +43,6 @@ function unsetproxy() {
     sudo tee /etc/environment << EOF
 EOF
 
-    gsettings set org.gnome.system.proxy mode none
-    sudo rm /etc/apt/apt.conf.d/95proxies
 }
 
 function usage() {
