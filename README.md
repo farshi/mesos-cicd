@@ -2,12 +2,16 @@ In this project I am going to show how you can simply use [Apahce Mesos](http://
 
 ###Requirements
 
-1-Install Vagrant
-2-Install Virtual Box
+1. Install Vagrant
+2. Install Virtual Box
 
 ###How to Run the code
 
-After fetchig the code from this repo:
+first fetch the code from this repo:
+`git clone https://github.com/farshi/mesos-cicd.git`
+
+and then
+
 ```shell
 $ cd mesos-cicd
 $ vagrant up
@@ -15,8 +19,8 @@ $ vagrant up
 ###Behind the proxy?
 If you are using http proxy server , then you need to comment out proxy settings blocks in these files
 
-  mesos-cicd\Vagrantfile
-  mesos-cicd\Jenkins\Dockerfile
+-  mesos-cicd\Vagrantfile
+- mesos-cicd\Jenkins\Dockerfile
 
 ###Installing specific version of docker and docker-compose in ubuntu
 
