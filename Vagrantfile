@@ -4,6 +4,8 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/trusty64"
+#uncomment the below line if you are using proxy and the when you run the vagrant up , pass the PRX=on
+ 
 #  config.vm.provision :shell, :path => "ubuntuproxy.sh", :args => ENV['PRX'] ,  run: "always"
 
 
