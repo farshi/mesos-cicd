@@ -17,8 +17,8 @@ In this project I am going to show how you can simply use [Apahce Mesos](http://
 
 first fetch the mesos-cicd and app1 from the github repos:
 ```shell
-$ git clone https://github.com/farshi/mesos-cicd.git`
-$ git clone  https://github.com/farshi/app1`
+$ git clone https://github.com/farshi/mesos-cicd.git
+$ git clone  https://github.com/farshi/app1
 ```
 and then
 
