@@ -21,3 +21,5 @@ If you are using http proxy server , then you need to comment out proxy settings
 
 - mesos-cicd\Vagrantfile
 - mesos-cicd\Jenkins\Dockerfile
+
+and then run  `PRX=on vagrant up`
