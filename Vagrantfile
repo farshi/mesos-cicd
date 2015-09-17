@@ -4,7 +4,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/trusty64"
-  config.vm.provision :shell, :path => "ubuntuproxy.sh", :args => ENV['PRX'] ,  run: "always"
+#  config.vm.provision :shell, :path => "ubuntuproxy.sh", :args => ENV['PRX'] ,  run: "always"
 
 
  config.vm.network "private_network", ip: "10.2.0.10", netmask: "255.255.0.0"
