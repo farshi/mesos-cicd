@@ -1,3 +1,7 @@
+
+
+###Practice Immutable Deployments 
+
 In this project I am going to show how you can simply use [Apahce Mesos](http://http://mesos.apache.org/), Marathon and  Jenkins to implement full Continuous Integration and Continuous Delivery (CI/CD). In this project I have useed vagrant which will automatically will install docker and docker-compose and by providing docker-compose.yml it will install and configuer  Jenkins , Mesos Master/Slave , Marathon and Zookeeper inside docker containers.
 
 
@@ -7,11 +11,13 @@ In this project I am going to show how you can simply use [Apahce Mesos](http://
 1.  Install [Virtual Box] (https://www.virtualbox.org/wiki/Downloads)
 2.  Install [Vagrant] (https://www.vagrantup.com/)
 3.  Install Vagrant [Docker Compose pluging] (https://github.com/leighmcculloch/vagrant-docker-compose)
+4.  Fetch the app1 code from https://github.com/farshi/app1 
 
 ###How to Run the code
 
-first fetch the code from this repo:
+first fetch the mesos-cicd and app1 from the github repos:
 `git clone https://github.com/farshi/mesos-cicd.git`
+`git clone  https://github.com/farshi/app1`
 
 and then
 
