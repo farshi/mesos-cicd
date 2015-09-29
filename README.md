@@ -2,7 +2,7 @@
 
 ###Practice Immutable Deployments 
 
-In this project I am going to show how you can simply use [Apahce Mesos](http://http://mesos.apache.org/), [Marathon](https://github.com/mesosphere/marathon) and  [Jenkins](https://jenkins-ci.org/) to implement full Continuous Integration and Continuous Delivery (CI/CD). In this project I have useed vagrant which will automatically will install docker and docker-compose and by providing docker-compose.yml it will install and configuer  Jenkins , Mesos Master/Slave , Marathon and Zookeeper inside docker containers.
+In this project I am going to show how you can simply use [Apahce Mesos](http://http://mesos.apache.org/), [Marathon](https://github.com/mesosphere/marathon) and  [Jenkins](https://jenkins-ci.org/) to implement full Continuous Integration and Continuous Delivery (CI/CD). In this project I have used vagrant which will automatically  install docker and docker-compose and by providing docker-compose.yml it will install and configure  Jenkins , Mesos Master and Slave, Marathon and Zookeeper all inside docker containers.
 
 
 
